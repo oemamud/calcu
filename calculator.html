@@ -1,0 +1,294 @@
+<!DOCTYPE html>  
+<html lang="id">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Kalkulator</title>  
+    <style>  
+        * {  
+            margin: 0;  
+            padding: 0;  
+            box-sizing: border-box;  
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
+        }  
+          
+        body {  
+            display: flex;  
+            justify-content: center;  
+            align-items: center;  
+            min-height: 100vh;  
+            background: linear-gradient(135deg, #6e8efb, #a777e3);  
+            padding: 20px;  
+        }  
+          
+        .calculator {  
+            width: 320px;  
+            background-color: #2c2c2c;  
+            border-radius: 15px;  
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);  
+            overflow: hidden;  
+        }  
+          
+        .display {  
+            padding: 20px;  
+            background-color: #1a1a1a;  
+            text-align: right;  
+            color: white;  
+        }  
+          
+        .previous-operand {  
+            min-height: 24px;  
+            font-size: 18px;  
+            color: rgba(255, 255, 255, 0.7);  
+            margin-bottom: 5px;  
+            overflow: hidden;  
+        }  
+          
+        .current-operand {  
+            min-height: 40px;  
+            font-size: 32px;  
+            font-weight: bold;  
+            overflow: hidden;  
+        }  
+          
+        .buttons {  
+            display: grid;  
+            grid-template-columns: repeat(4, 1fr);  
+            gap: 1px;  
+            background-color: #3a3a3a;  
+        }  
+          
+        button {  
+            border: none;  
+            padding: 20px 0;  
+            font-size: 20px;  
+            cursor: pointer;  
+            background-color: #4a4a4a;  
+            color: white;  
+            transition: background-color 0.2s;  
+        }  
+          
+        button:hover {  
+            background-color: #5a5a5a;  
+        }  
+          
+        button:active {  
+            background-color: #6a6a6a;  
+        }  
+          
+        .operator {  
+            background-color: #ff9500;  
+        }  
+          
+        .operator:hover {  
+            background-color: #ffaa33;  
+        }  
+          
+        .operator:active {  
+            background-color: #ffbb55;  
+        }  
+          
+        .equals {  
+            background-color: #ff9500;  
+            grid-column: span 2;  
+        }  
+          
+        .equals:hover {  
+            background-color: #ffaa33;  
+        }  
+          
+        .equals:active {  
+            background-color: #ffbb55;  
+        }  
+          
+        .clear {  
+            background-color: #a6a6a6;  
+            color: black;  
+        }  
+          
+        .clear:hover {  
+            background-color: #b6b6b6;  
+        }  
+          
+        .clear:active {  
+            background-color: #c6c6c6;  
+        }  
+          
+        .zero {  
+            grid-column: span 2;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="calculator">  
+        <div class="display">  
+            <div class="previous-operand"></div>  
+            <div class="current-operand">0</div>  
+        </div>  
+        <div class="buttons">  
+            <button class="clear">AC</button>  
+            <button class="operator">%</button>  
+            <button class="operator">/</button>  
+            <button class="operator">×</button>  
+              
+            <button class="number">7</button>  
+            <button class="number">8</button>  
+            <button class="number">9</button>  
+            <button class="operator">-</button>  
+              
+            <button class="number">4</button>  
+            <button class="number">5</button>  
+            <button class="number">6</button>  
+            <button class="operator">+</button>  
+              
+            <button class="number">1</button>  
+            <button class="number">2</button>  
+            <button class="number">3</button>  
+            <button class="equals">=</button>  
+              
+            <button class="number zero">0</button>  
+            <button class="number">.</button>  
+        </div>  
+    </div>  
+  
+    <script>  
+        document.addEventListener('DOMContentLoaded', function() {  
+            const displayPrevious = document.querySelector('.previous-operand');  
+            const displayCurrent = document.querySelector('.current-operand');  
+            const numberButtons = document.querySelectorAll('.number');  
+            const operatorButtons = document.querySelectorAll('.operator');  
+            const equalsButton = document.querySelector('.equals');  
+            const clearButton = document.querySelector('.clear');  
+              
+            let currentOperand = '0';  
+            let previousOperand = '';  
+            let operation = null;  
+            let resetScreen = false;  
+              
+            // Fungsi untuk memperbarui tampilan  
+            function updateDisplay() {  
+                displayCurrent.textContent = currentOperand;  
+                if (operation != null) {  
+                    displayPrevious.textContent = `${previousOperand} ${operation}`;  
+                } else {  
+                    displayPrevious.textContent = '';  
+                }  
+            }  
+              
+            // Fungsi untuk menambahkan angka  
+            function appendNumber(number) {  
+                if (currentOperand === '0' || resetScreen) {  
+                    currentOperand = number;  
+                    resetScreen = false;  
+                } else {  
+                    currentOperand += number;  
+                }  
+            }  
+              
+            // Fungsi untuk menambahkan titik desimal  
+            function addDecimal() {  
+                if (resetScreen) {  
+                    currentOperand = '0.';  
+                    resetScreen = false;  
+                    return;  
+                }  
+                  
+                if (currentOperand.includes('.')) return;  
+                currentOperand += '.';  
+            }  
+              
+            // Fungsi untuk memilih operasi  
+            function chooseOperation(op) {  
+                if (currentOperand === '') return;  
+                  
+                if (previousOperand !== '') {  
+                    calculate();  
+                }  
+                  
+                operation = op;  
+                previousOperand = currentOperand;  
+                resetScreen = true;  
+            }  
+              
+            // Fungsi untuk melakukan perhitungan  
+            function calculate() {  
+                let computation;  
+                const prev = parseFloat(previousOperand);  
+                const current = parseFloat(currentOperand);  
+                  
+                if (isNaN(prev) || isNaN(current)) return;  
+                  
+                switch (operation) {  
+                    case '+':  
+                        computation = prev + current;  
+                        break;  
+                    case '-':  
+                        computation = prev - current;  
+                        break;  
+                    case '×':  
+                        computation = prev * current;  
+                        break;  
+                    case '/':  
+                        if (current === 0) {  
+                            alert("Tidak bisa membagi dengan nol!");  
+                            return;  
+                        }  
+                        computation = prev / current;  
+                        break;  
+                    case '%':  
+                        computation = prev % current;  
+                        break;  
+                    default:  
+                        return;  
+                }  
+                  
+                currentOperand = computation.toString();  
+                operation = null;  
+                previousOperand = '';  
+            }  
+              
+            // Fungsi untuk menghapus semua  
+            function clear() {  
+                currentOperand = '0';  
+                previousOperand = '';  
+                operation = null;  
+            }  
+              
+            // Event listener untuk tombol angka  
+            numberButtons.forEach(button => {  
+                button.addEventListener('click', () => {  
+                    if (button.textContent === '.') {  
+                        addDecimal();  
+                    } else {  
+                        appendNumber(button.textContent);  
+                    }  
+                    updateDisplay();  
+                });  
+            });  
+              
+            // Event listener untuk tombol operator  
+            operatorButtons.forEach(button => {  
+                button.addEventListener('click', () => {  
+                    chooseOperation(button.textContent);  
+                    updateDisplay();  
+                });  
+            });  
+              
+            // Event listener untuk tombol sama dengan  
+            equalsButton.addEventListener('click', () => {  
+                calculate();  
+                updateDisplay();  
+            });  
+              
+            // Event listener untuk tombol clear  
+            clearButton.addEventListener('click', () => {  
+                clear();  
+                updateDisplay();  
+            });  
+              
+            // Inisialisasi tampilan  
+            updateDisplay();  
+        });  
+    </script>  
+</body>  
+</html>  
